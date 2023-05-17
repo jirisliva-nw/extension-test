@@ -1,0 +1,10 @@
+{
+    "type": "object",
+    "properties": {
+        "DescriptionUrl": {
+            "title": "Description URL.",
+            "description": "Where desc.json is.",
+            "type": "string"
+        }
+    }
+}

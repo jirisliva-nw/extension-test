@@ -1,0 +1,80 @@
+build-package-to-stage:
+  stage: build
+  tags:
+    - linux
+    - docker-build
+  script:
+    - export BUILD_VERSION=$(git describe --tags --long | sed -n 's/version-\(.*\)-.*-.*/\1/p')
+    - export COMMIT_COUNT=$(git describe --tags --long | sed -n 's/version-.*-\(.*\)-.*/\1/p')
+    - echo "${BUILD_VERSION}-${COMMIT_COUNT}"
+    - cp -f SimpleLauncher/manifest-DEFAULT.json SimpleLauncher/manifest.json
+    - rm -f SimpleLauncher/manifest-DEFAULT.json
+    - sed -i "s/__VERSION__/${BUILD_VERSION}/" SimpleLauncher/manifest.json
+    - mkdir packages
+    - zip -r packages/Newired-BrowserExtension-Chrome-${BUILD_VERSION}-${COMMIT_COUNT}.zip SimpleLauncher/
+
+  only:
+    - master
+    
+  artifacts:
+    name: "Newired-BrowserExtension-Chrome-$BUILD_VERSION-${COMMIT_COUNT}"
+    paths:
+      - packages/*.zip
+
+deploy-package-to-stage:
+  stage: deploy
+  tags:
+    - linux
+    - docker-build
+  script:
+    - export BUILD_VERSION=$(git describe --tags --long | sed -n 's/version-\(.*\)-.*-.*/\1/p')
+    - export COMMIT_COUNT=$(git describe --tags --long | sed -n 's/version-.*-\(.*\)-.*/\1/p')
+    - echo "${BUILD_VERSION}-${COMMIT_COUNT}"
+    - cp packages/Newired-BrowserExtension-Chrome-${BUILD_VERSION}-${COMMIT_COUNT}.zip /opt/newired-downloads/BrowserExtensions/Chrome/
+
+  dependencies:
+    - build-package-to-stage
+    
+  only:
+    - master
+    
+build-package-to-release:
+  stage: build
+  tags:
+    - linux
+    - docker-build
+  script:
+#    - export BUILD_VERSION=$(git describe --tags --long | sed -n 's/version-\(.*\)-.*-.*/\1/p')
+    - export BUILD_VERSION=$(echo ${CI_COMMIT_REF_NAME} | sed -n 's/release-\(.*\)/\1/p')
+    - echo $BUILD_VERSION
+    - cp -f SimpleLauncher/manifest-DEFAULT.json SimpleLauncher/manifest.json
+    - rm -f SimpleLauncher/manifest-DEFAULT.json
+    - sed -i "s/__VERSION__/${BUILD_VERSION}/" SimpleLauncher/manifest.json
+    - mkdir packages
+    - zip -r packages/Newired-BrowserExtension-Chrome-release-${BUILD_VERSION}.zip SimpleLauncher/
+
+  only:
+    - /^release-.*$/
+    
+  artifacts:
+    name: "Newired-BrowserExtension-Chrome-$BUILD_VERSION"
+    paths:
+      - packages/*.zip
+
+deploy-package-to-release:
+  stage: deploy
+  tags:
+    - linux
+    - docker-build
+  script:
+#    - export BUILD_VERSION=$(git describe --tags --long | sed -n 's/version-\(.*\)-.*-.*/\1/p')
+    - export BUILD_VERSION=$(echo ${CI_COMMIT_REF_NAME} | sed -n 's/release-\(.*\)/\1/p')
+    - echo $BUILD_VERSION
+    - cp packages/Newired-BrowserExtension-Chrome-release-${BUILD_VERSION}.zip /opt/newired-downloads/BrowserExtensions/Chrome/
+
+  dependencies:
+    - build-package-to-release
+    
+  only:
+    - /^release-.*$/
+

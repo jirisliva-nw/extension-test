@@ -1,0 +1,58 @@
+{
+    "manifest_version": 2,
+    "name": "Newired Extension",
+    "description": "Launch an interactive guidance layer on top of any of your existing web applications.",
+    "version": "__VERSION__",
+    "icons": {
+        "16": "images/icon.png",
+        "48": "images/icon48.png",
+        "128": "images/icon.png"
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "http://*/*",
+                "https://*/*"
+            ],
+            "js": [
+                "content/custom-elements.js",
+                "content/main-page.js"
+            ]
+        },
+        {
+            "matches": [
+                "*://*/*"
+            ],
+            "match_about_blank": true,
+            "all_frames": true,
+            "run_at": "document_idle",
+            "js": [
+                "content/custom-elements.js",
+                "content/bubble-frame.js"
+            ]
+        }
+    ],
+    "permissions": [
+        "webNavigation",
+        "cookies",
+        "storage",
+        "activeTab",
+        "file:///*",
+        "http://*/*",
+        "https://*/*",
+        "tabs"
+    ],
+    "browser_action": {
+        "default_popup": "popup.html",
+        "default_icon": "images/icon.png"
+    },
+    "web_accessible_resources": [
+        "images/*.png"
+    ],
+    "background": {
+        "scripts": [
+            "background.js"
+        ],
+        "persistent": false
+    }
+}
