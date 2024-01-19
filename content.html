@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" href="/icons/favicon.ico">
+    <link href="/resources/bootstrap/bootstrap.min.css" rel="stylesheet" crossorigin="anonymous">
+    <link href="/resources/index.css" rel="stylesheet">
+    <title>content-delivery</title>
+</head>
+
+<body>
+
+<div class="container-xxl my-md-4 bd-layout">
+    <h1>Content-Delivery</h1>
+</div>
+
+<script>
+    // Set a hasAccess boolean variable which defaults to false.
+    let hasAccess = false;
+
+    async function handleCookieAccessInit() {
+        if (!document.hasStorageAccess) {
+            // Storage Access API is not supported so best we can do is
+            // hope it's an older browser that doesn't block 3P cookies.
+            hasAccess = true;
+        } else {
+            // Check whether access has been granted via the Storage Access API.
+            // Note on page load this will always be false initially so we could be
+            // skipped in this example, but including for completeness for when this
+            // is not so obvious.
+            hasAccess = await document.hasStorageAccess();
+            if (!hasAccess) {
+
+                try {
+                    await document.requestStorageAccess();
+                    hasAccess = true; // Can assume this was true if above did not reject.
+                } catch (err) {
+                    // Access was not granted and it may be gated behind an interaction
+                    return;
+                }
+            }
+        }
+        if (hasAccess) {
+            // Use the cookies.
+
+            console.log(` **** has access`)
+        }
+    }
+
+    handleCookieAccessInit();
+</script>
+
+</body>
+</html>
